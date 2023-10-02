@@ -31,7 +31,6 @@ export class Aspect implements IAspectTransaction, IAspectBlock, IAspectOperatio
      * (including upgrade, config, destroy) is made, isOwner method will be invoked to check
      * against the initiator's account to make sure it has the permission.
      *
-     * @param ctx context of Aspect state
      * @param sender address of the operation initiator
      * @return true if check success, false if check fail
      */
@@ -84,31 +83,7 @@ export class Aspect implements IAspectTransaction, IAspectBlock, IAspectOperatio
      * @return result of Aspect execution
      */
     preContractCall(ctx: PreContractCallCtx): void {
-        // Get the method of currently called contract.
-        const currentCallMethod = ethereum.parseMethodSig(ctx.currentCall.data);
-
-        // Define functions that are not allowed to be reentered.
-        const noReentrantMethods : Array<string> = [
-            ethereum.computeMethodSig('add_liquidity()'),
-            ethereum.computeMethodSig('remove_liquidity()')
-        ];
-
-        // Verify if the current method is within the scope of functions that are not susceptible to reentrancy.
-        if (noReentrantMethods.includes(currentCallMethod)) {
-            // Check if there already exists a non-reentrant method on the current call path.
-            let parentIndex = ctx.currentCall.parentIndex;
-            // Retrieve the call stack from the context, which refers to
-            // all contract calls along the path of the current contract method invocation.
-            while (parentIndex >= 0) {
-                const parentCall = ctx.trace.findCall(parentIndex)!;
-                const parentCallMethod = ethereum.parseMethodSig(parentCall.data);
-                if (noReentrantMethods.includes(parentCallMethod)) {
-                    // If yes, revert the transaction.
-                    vm.revert(`illegal transaction: method reentered from ${currentCallMethod} to ${parentCallMethod}`);
-                }
-                parentIndex = parentCall.parentIndex;
-            }
-        }
+        // Implement here...
     }
 
     /**
@@ -166,9 +141,10 @@ export class Aspect implements IAspectTransaction, IAspectBlock, IAspectOperatio
 
 
     /**
-     * operation is a Aspect call.
+     * operation is an Aspect call.
      *
-     * @param ctx  tx input
+     * @param ctx  context of aspect call
+     * @param data tx input data
      * @return result of operation execution
      */
     operation(ctx: OperationCtx, data: Uint8Array): Uint8Array{
