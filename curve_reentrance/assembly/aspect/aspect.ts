@@ -13,7 +13,7 @@ import {
     PreTxExecuteCtx,
     OperationCtx,
     ethereum,
-    vm
+    sys
 } from "@artela/aspect-libs";
 
 /**
